@@ -65,12 +65,22 @@ h2 {
 	margin-right: 10px;
 	display: flex;
 }
-.cart__item__content__settings__delete p {
+.cart__item__content__settings__delete button {
 	display: inline;
+	border: none;
+	background: none;
+	color: white;
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	font-family: 'Montserrat', sans-serif;
+	
 }
-.cart__item__content__settings__delete p:hover {
+.cart__item__content__settings__delete button:hover {
 	cursor: pointer;
 	font-weight: 700;
+	text-decoration: underline white;
+	
 }
 
 /*******/
