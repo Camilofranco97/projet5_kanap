@@ -60,19 +60,12 @@ async function start() {
 
 function generateEventListener() {
   let inputNumber = document.querySelectorAll(".itemQuantity");
-  inputNumber.forEach((input) => {
-    input.addEventListener("click", (e) => {
-      console.log(e);
-      changeQuantity();
-    });
-  });
-  // generer l'ensemble des eventlistener sur les boutons delete et sur les inputs
-  // la fonction executé quand il y a un changement cest un callback
-  // 1° l id 2° la cible
+  for (const input of inputNumber) {
+    input.addEventListener("click", (e) => changeQuantity(e.target.id));
+  }
 
   // ecouter le bouton supprimer
   let removeBtn = document.querySelectorAll(".deleteItem");
-  console.log(removeBtn);
   for (const btn of removeBtn) {
     btn.addEventListener("click", (e) => clickToDelete(e.target.id));
   }
@@ -80,9 +73,18 @@ function generateEventListener() {
 // modifier la quantité du produit
 let totalSelectedProducts = selectedProducts.length;
 
-function changeQuantity() {
-  for (let i = 0; i < totalSelectedProducts.length; i++) {}
-  console.log("toto");
+function productNewQuantity() {
+  let inputNumber = document.querySelectorAll(".itemQuantity");
+  for (const input of inputNumber) {
+    input.addEventListener("click", (e) => {
+      console.log(input.value);
+    });
+  }
+}
+
+function changeQuantity(id) {
+  console.log(id);
+  productNewQuantity();
 }
 
 // Supprimer un article
