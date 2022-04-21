@@ -4,6 +4,7 @@ let selectedProducts = JSON.parse(localStorage.getItem("product"));
 let productsLocalStorage = [];
 let cartItems = document.getElementById("cart__items");
 console.log(selectedProducts);
+let orderId = "";
 
 //recupération de l'article avec l'api
 async function displayProductInfo(id) {
@@ -61,7 +62,9 @@ async function start() {
 function generateEventListener() {
   let inputNumber = document.querySelectorAll(".itemQuantity");
   for (const input of inputNumber) {
-    input.addEventListener("click", (e) => changeQuantity(e.target.id));
+    input.addEventListener("click", (e) =>
+      changeQuantity(input.value, e.target.id)
+    );
   }
 
   // ecouter le bouton supprimer
@@ -82,9 +85,18 @@ function productNewQuantity() {
   }
 }
 
-function changeQuantity(id) {
-  console.log(id);
-  productNewQuantity();
+function changeQuantity(quantity, id) {
+  //productNewQuantity();
+  console.log("quantity", quantity, id);
+  let localStorageproducts = [...selectedProducts];
+  console.log(localStorageproducts);
+  let filterProduct = localStorageproducts.filter(
+    (product) => product.id == id
+  )[0];
+  filterProduct.quantity = quantity;
+  console.log(filterProduct);
+  localStorage.setItem("product", JSON.stringify(localStorageproducts));
+  //productTable.push(filterProduct);
 }
 
 // Supprimer un article
@@ -132,3 +144,129 @@ await start();
 generateEventListener();
 await sumProducts();
 sumArticles();
+
+// -------------------------------------------------Formulaire------------------------------------------------
+// Récuperation des données
+
+const btnOrder = document.querySelector("#order");
+
+btnOrder.addEventListener("click", (e) => {
+  e.preventDefault();
+  let contact = {
+    firstName: document.querySelector("#firstName").value,
+    lastName: document.querySelector("#lastName").value,
+    address: document.querySelector("#address").value,
+    city: document.querySelector("#city").value,
+    email: document.querySelector("#email").value,
+  };
+  console.log(contact);
+
+  // vérifications de données
+
+  // prénom
+  function regExpFirstName() {
+    const firstNameForm = contact.firstName;
+
+    if (/^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/.test(firstNameForm)) {
+      console.log("ok firstName");
+      return true;
+    } else {
+      console.log("Ko firstName");
+      style.color = red;
+    }
+  }
+  //Nom
+  function regExpLastName() {
+    const lastNameForm = contact.lastName;
+
+    if (/^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/.test(lastNameForm)) {
+      console.log("ok lastName");
+      return true;
+    } else {
+      console.log("Ko lastName");
+    }
+  }
+
+  //ville
+  function regExpCity() {
+    const cityForm = contact.city;
+
+    if (/^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/.test(cityForm)) {
+      console.log("ok city");
+      return true;
+    } else {
+      console.log("ko city");
+    }
+  }
+
+  // adresse
+  function regExpEmail() {
+    const emailForm = contact.email;
+    if (
+      /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/.test(emailForm)
+    ) {
+      console.log("ok email");
+      return true;
+    } else {
+      console.log("ko email");
+    }
+  }
+  // email
+  function regExpAddress() {
+    const addressForm = contact.address;
+    if (/^[a-zA-Z0-9.,-_ ]{5,100}[ ]{0,2}$/.test(addressForm)) {
+      console.log("ok adress");
+      return true;
+    } else {
+      console.log("ko adress");
+    }
+  }
+
+  // vérification de données en cas d'erreur
+  if (
+    regExpFirstName() &
+    regExpLastName() &
+    regExpCity() &
+    regExpEmail() &
+    regExpAddress()
+  ) {
+    //envoyer les données au localstorage
+    console.log("formulaire ok");
+    localStorage.setItem("contact", JSON.stringify(contact));
+  } else {
+    alert("Merci de vérifier vos données dans le formulaire");
+  }
+
+  //envoyer les données vers un serveur ---------------------------------------------------------------------
+
+  let product = JSON.parse(localStorage.getItem("product"));
+  let sendForm = {
+    contact,
+    product,
+  };
+  console.log(sendForm);
+  const sendToServer = fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    body: JSON.stringify(sendForm),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    // Ensuite on stock la réponse de l'api (orderId)
+    .then((response) => {
+      return response.json();
+    })
+    .then((server) => {
+      console.log(server);
+    });
+  // Si la variable orderId n'est pas une chaîne vide on redirige notre utilisateur sur la page confirmation avec la variable
+  if (orderId != "") {
+    location.href = "confirmation.html?id=" + orderId;
+  }
+});
+
+//garder les données du contact dans  une variable
+
+const dataContact = JSON.parse(localStorage.getItem("contact"));
+
+console.log(dataContact);
