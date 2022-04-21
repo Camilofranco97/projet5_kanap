@@ -56,6 +56,7 @@ async function start() {
     `;
     }
     cartItems.innerHTML = showItemsAtLocalStorage;
+    sumProducts();
   }
 }
 
@@ -85,18 +86,17 @@ function productNewQuantity() {
   }
 }
 
-function changeQuantity(quantity, id) {
-  //productNewQuantity();
-  console.log("quantity", quantity, id);
+function changeQuantity(productQuantity, id) {
+  // modifier la quantité
+  console.log("quantity", productQuantity, id);
   let localStorageproducts = [...selectedProducts];
   console.log(localStorageproducts);
   let filterProduct = localStorageproducts.filter(
     (product) => product.id == id
   )[0];
-  filterProduct.quantity = quantity;
+  filterProduct.productQuantity = productQuantity;
   console.log(filterProduct);
   localStorage.setItem("product", JSON.stringify(localStorageproducts));
-  //productTable.push(filterProduct);
 }
 
 // Supprimer un article
@@ -114,16 +114,16 @@ function clickToDelete(id) {
 // récupérer les prix des produits et les additionner
 async function sumProducts() {
   let totalPrice = document.getElementById("totalPrice");
-  let totalCart = [];
+  let totalCart = 0;
   for (const selectedProduct of selectedProducts) {
     const myData = await displayProductInfo(selectedProduct.productId);
-    totalCart.push(myData.price * selectedProduct.productQuantity);
-  }
 
-  const totalSum = totalCart.reduce((accumulator, currentValue) => {
-    return accumulator + currentValue;
-  }, 0);
-  totalPrice.innerHTML = totalSum;
+    console.log("hey", totalCart);
+    totalCart = Number(
+      totalCart + myData.price * selectedProduct.productQuantity
+    );
+  }
+  totalPrice.innerHTML = `${totalCart}`;
 }
 
 function sumArticles() {
@@ -245,28 +245,11 @@ btnOrder.addEventListener("click", (e) => {
     product,
   };
   console.log(sendForm);
-  const sendToServer = fetch("http://localhost:3000/api/products/order", {
+  fetch("http://localhost:3000/api/products/order", {
     method: "POST",
-    body: JSON.stringify(sendForm),
     headers: {
-      "Content-Type": "application/json",
+      "Content-type": "application/json",
     },
-  })
-    // Ensuite on stock la réponse de l'api (orderId)
-    .then((response) => {
-      return response.json();
-    })
-    .then((server) => {
-      console.log(server);
-    });
-  // Si la variable orderId n'est pas une chaîne vide on redirige notre utilisateur sur la page confirmation avec la variable
-  if (orderId != "") {
-    location.href = "confirmation.html?id=" + orderId;
-  }
+    body: JSON.stringify(sendForm),
+  });
 });
-
-//garder les données du contact dans  une variable
-
-const dataContact = JSON.parse(localStorage.getItem("contact"));
-
-console.log(dataContact);
