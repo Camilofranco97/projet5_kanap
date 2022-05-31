@@ -3,7 +3,6 @@ let selectedProducts = JSON.parse(localStorage.getItem("product"));
 
 let productsLocalStorage = [];
 let cartItems = document.getElementById("cart__items");
-console.log(selectedProducts);
 let orderId = "";
 
 //recupération de l'article avec l'api
@@ -54,9 +53,10 @@ async function start() {
       </div>
     </article>
     `;
+
+      productsLocalStorage.push(selectedProduct.productId);
     }
     cartItems.innerHTML = showItemsAtLocalStorage;
-    sumProducts();
   }
 }
 
@@ -77,26 +77,30 @@ function generateEventListener() {
 // modifier la quantité du produit
 let totalSelectedProducts = selectedProducts.length;
 
+// recuperer les Id des produits dans une variable
+const productsId = selectedProducts.map((product) =>
+  product.productId.toString()
+);
+
 function productNewQuantity() {
   let inputNumber = document.querySelectorAll(".itemQuantity");
   for (const input of inputNumber) {
     input.addEventListener("click", (e) => {
-      console.log(input.value);
+      updateCartTotalPrice();
     });
   }
 }
 
 function changeQuantity(productQuantity, id) {
   // modifier la quantité
-  console.log("quantity", productQuantity, id);
   let localStorageproducts = [...selectedProducts];
-  console.log(localStorageproducts);
   let filterProduct = localStorageproducts.filter(
     (product) => product.id == id
   )[0];
   filterProduct.productQuantity = productQuantity;
-  console.log(filterProduct);
   localStorage.setItem("product", JSON.stringify(localStorageproducts));
+  updateCartTotalPrice();
+  updateArticlesCartTotal();
 }
 
 // Supprimer un article
@@ -107,43 +111,46 @@ function clickToDelete(id) {
   for (const displayOff of removeCard) {
     displayOff.addEventListener("click", (e) => {
       displayOff.style.display = "none";
+      console.log(displayOff);
     });
   }
+  location.reload();
 }
 
-// récupérer les prix des produits et les additionner
-async function sumProducts() {
-  let totalPrice = document.getElementById("totalPrice");
-  let totalCart = 0;
-  for (const selectedProduct of selectedProducts) {
-    const myData = await displayProductInfo(selectedProduct.productId);
-
-    console.log("hey", totalCart);
-    totalCart = Number(
-      totalCart + myData.price * selectedProduct.productQuantity
+function updateCartTotalPrice() {
+  let total = 0;
+  const cartTotalPrice = document.querySelector("#totalPrice");
+  const cartTotalItems = document.querySelectorAll(".cart__item");
+  cartTotalItems.forEach((cartTotalItem) => {
+    const cartItemPrice = cartTotalItem.querySelector(".price");
+    const shoppingCartItemPrice = Number(
+      cartItemPrice.textContent.replace("€", "")
     );
-  }
-  totalPrice.innerHTML = `${totalCart}`;
+    const cartItemQuantity = cartTotalItem.querySelector(".itemQuantity");
+    cartItemQuantity.addEventListener("click", (e) => {});
+    const shoppingCartItemQuantity = Number(cartItemQuantity.value);
+    total = total + shoppingCartItemPrice * shoppingCartItemQuantity;
+  });
+  cartTotalPrice.innerHTML = `${total}`;
 }
 
-function sumArticles() {
-  let totalQuantity = document.getElementById("totalQuantity");
-  let totalArticle = [];
-  let inputNumber = document.querySelectorAll(".itemQuantity");
-  for (const number of inputNumber) {
-    totalArticle.push(parseInt(number.value));
-  }
-  console.log(totalArticle);
-  const totalSumQuantity = totalArticle.reduce((accumulator, currentValue) => {
-    return accumulator + currentValue;
-  }, 0);
-  totalQuantity.innerHTML = totalSumQuantity;
+function updateArticlesCartTotal() {
+  let total = 0;
+  const cartTotalQuantity = document.querySelector("#totalQuantity");
+  const cartTotalItems = document.querySelectorAll(".cart__item");
+  cartTotalItems.forEach((cartTotalItem) => {
+    const cartItemQuantity = cartTotalItem.querySelector(".itemQuantity");
+    const shoppingCartItemQuantity = Number(cartItemQuantity.value);
+    total = total + shoppingCartItemQuantity;
+  });
+
+  cartTotalQuantity.innerHTML = `${total}`;
 }
 
 await start();
 generateEventListener();
-await sumProducts();
-sumArticles();
+updateCartTotalPrice();
+updateArticlesCartTotal();
 
 // -------------------------------------------------Formulaire------------------------------------------------
 // Récuperation des données
@@ -159,8 +166,6 @@ btnOrder.addEventListener("click", (e) => {
     city: document.querySelector("#city").value,
     email: document.querySelector("#email").value,
   };
-  console.log(contact);
-
   // vérifications de données
 
   // prénom
@@ -168,11 +173,8 @@ btnOrder.addEventListener("click", (e) => {
     const firstNameForm = contact.firstName;
 
     if (/^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/.test(firstNameForm)) {
-      console.log("ok firstName");
       return true;
     } else {
-      console.log("Ko firstName");
-      style.color = red;
     }
   }
   //Nom
@@ -180,10 +182,8 @@ btnOrder.addEventListener("click", (e) => {
     const lastNameForm = contact.lastName;
 
     if (/^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/.test(lastNameForm)) {
-      console.log("ok lastName");
       return true;
     } else {
-      console.log("Ko lastName");
     }
   }
 
@@ -192,10 +192,8 @@ btnOrder.addEventListener("click", (e) => {
     const cityForm = contact.city;
 
     if (/^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/.test(cityForm)) {
-      console.log("ok city");
       return true;
     } else {
-      console.log("ko city");
     }
   }
 
@@ -205,20 +203,16 @@ btnOrder.addEventListener("click", (e) => {
     if (
       /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/.test(emailForm)
     ) {
-      console.log("ok email");
       return true;
     } else {
-      console.log("ko email");
     }
   }
   // email
   function regExpAddress() {
     const addressForm = contact.address;
     if (/^[a-zA-Z0-9.,-_ ]{5,100}[ ]{0,2}$/.test(addressForm)) {
-      console.log("ok adress");
       return true;
     } else {
-      console.log("ko adress");
     }
   }
 
@@ -233,23 +227,39 @@ btnOrder.addEventListener("click", (e) => {
     //envoyer les données au localstorage
     console.log("formulaire ok");
     localStorage.setItem("contact", JSON.stringify(contact));
+    sendToServer();
   } else {
     alert("Merci de vérifier vos données dans le formulaire");
   }
 
   //envoyer les données vers un serveur ---------------------------------------------------------------------
+  function sendToServer() {
+    //productsIdproducts;
+    let orderId = "";
+    let sendForm = {
+      contact: {
+        ...contact,
+      },
+      products: [...productsId],
+    };
 
-  let product = JSON.parse(localStorage.getItem("product"));
-  let sendForm = {
-    contact,
-    product,
-  };
-  console.log(sendForm);
-  fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify(sendForm),
-  });
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      body: JSON.stringify(sendForm),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(async (response) => {
+      try {
+        const result = await response.json();
+        orderId = result.orderId;
+        console.log("orderId", orderId, result);
+        location.href = "confirmation.html?id=" + orderId;
+        localStorage.clear();
+        return result;
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  }
 });

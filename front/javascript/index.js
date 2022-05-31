@@ -17,7 +17,7 @@ const showProducts = async () => {
         </a> 
         `;
   });
-  console.log(productsHtml);
+
   items.innerHTML = productsHtml.join("");
 };
 

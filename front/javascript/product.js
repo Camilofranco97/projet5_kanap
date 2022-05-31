@@ -5,6 +5,7 @@ const title = document.getElementById("title");
 const price = document.getElementById("price");
 const description = document.getElementById("description");
 const btnAddToCart = document.getElementById("addToCart");
+const itemQuantity = document.querySelector("#quantity");
 
 const getUrl = new URLSearchParams(window.location.search);
 const id = getUrl.get("id");
@@ -49,8 +50,12 @@ function addToCart(product) {
 
   if (productColor() == "") {
     return alert("Vous n'avez pas sélectionné la couleur du canapé!");
-  } else if (productQuantity() == 0 || productQuantity() < 0) {
-    return alert("Veuillez définir le nombre d'article !");
+  } else if (
+    productQuantity() == 0 ||
+    productQuantity() < 0 ||
+    productQuantity() > 100
+  ) {
+    return alert("Veuillez définir ou modifier le nombre d'article !");
   }
 
   function localSotorageContent() {
@@ -64,13 +69,12 @@ function addToCart(product) {
     productQuantity
   ) {
     const newLocaleStorage = [...productsInLocalStorage];
-    console.log("test", newLocaleStorage);
+
     const newProduct = newLocaleStorage.find(
       (element) => element.id === productTargeted.id
     );
-    console.log("new", newProduct);
+
     newProduct.productQuantity = newProduct.productQuantity + productQuantity;
-    console.log("je dois update", newProduct);
 
     localStorage.setItem("product", JSON.stringify(newLocaleStorage));
   }
@@ -79,22 +83,20 @@ function addToCart(product) {
     const newLocaleStorage = productsInLocalStorage
       ? [...productsInLocalStorage]
       : [];
-    console.log("productOptions", productOptions);
+
     newLocaleStorage.push(productOptions);
     localStorage.setItem("product", JSON.stringify(newLocaleStorage));
   }
 
   function sendMyProductToCart(productOptions, productsInLocalStorage) {
-    //console.log("productOptions", productOptions);
     const { id, productColor, productQuantity } = productOptions;
     const productTargeted =
       productsInLocalStorage &&
       productsInLocalStorage.find(
         (element) => element.id === id && element.productColor === productColor
       );
-    //console.log("productsInLocalStorage", productsInLocalStorage);
+
     if (productTargeted && productTargeted.productColor === productColor) {
-      console.log("production", productQuantity);
       updateProductToCart(
         productTargeted,
         productsInLocalStorage,
@@ -113,7 +115,7 @@ function addToCart(product) {
     productColor: productColor(),
     productQuantity: productQuantity(),
   };
-  console.log(myLocalStorage, productOptions);
+
   sendMyProductToCart(productOptions, myLocalStorage);
 }
 btnAddToCart.addEventListener("click", (e) => {
