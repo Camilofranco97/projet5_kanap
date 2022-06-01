@@ -10,7 +10,7 @@ const itemQuantity = document.querySelector("#quantity");
 const getUrl = new URLSearchParams(window.location.search);
 const id = getUrl.get("id");
 
-//recupération de l'article avec l'api
+//take back of the article with the api and his id
 function displayProductInfo() {
   fetch(`http://localhost:3000/api/products/${id}`)
     .then((res) => {
@@ -35,7 +35,7 @@ function displayProductInfo() {
 displayProductInfo();
 
 function addToCart(product) {
-  //function pour la quantité et la couleur
+  //fonction for the quantity and the color
   function productQuantity() {
     const quantity = document.getElementById("quantity");
     return parseInt(quantity.value);
@@ -46,7 +46,7 @@ function addToCart(product) {
     return colorSelect.value;
   }
 
-  //si la couleur ou la quantité ne sont pas selectionnées mettre un message d'alert
+  //if the color and the quantity are not selected put an alert message
 
   if (productColor() == "") {
     return alert("Vous n'avez pas sélectionné la couleur du canapé!");
@@ -108,7 +108,7 @@ function addToCart(product) {
     }
   }
   const myLocalStorage = localSotorageContent();
-  // produit choisi
+  // chosen product
   const productOptions = {
     id: id + "_" + productColor(),
     productId: id,

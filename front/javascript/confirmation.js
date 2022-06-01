@@ -1,4 +1,4 @@
-// Fonction pour récupérer l'order ID dans la barre d'adresse pour le réinjecter dans le HTML de la page de confirmation
+// Function to retrive the order ID from the link and them injet back into the confirmation page.
 async function getOrderId() {
   const idLocation = document.querySelector("#orderId");
   const getUrl = window.location.search;

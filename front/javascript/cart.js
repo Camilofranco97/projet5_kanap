@@ -1,25 +1,23 @@
-// recupérer les produits dans le localstorage
+// take back the products from the localstorage
 let selectedProducts = JSON.parse(localStorage.getItem("product"));
 
 let productsLocalStorage = [];
 let cartItems = document.getElementById("cart__items");
 let orderId = "";
 
-//recupération de l'article avec l'api
+//take back of the article with the api and his id
 async function displayProductInfo(id) {
   const result = await fetch(`http://localhost:3000/api/products/${id}`).then(
     (res) => res.json()
   );
-
   return result;
 }
 
 async function start() {
-  // afficher un panier vide
-  if (selectedProducts.length == 0) {
+  // display an empty cart
+  if (selectedProducts.length == 0 || selectedProducts.length == null) {
     let title = (document.querySelector("h1").textContent = "Panier Vide");
-
-    // afficher les produits selectionnés
+    // display selected products
   } else {
     let title = (document.querySelector("h1").textContent = "Votre panier");
     let showItemsAtLocalStorage;
@@ -68,16 +66,14 @@ function generateEventListener() {
     );
   }
 
-  // ecouter le bouton supprimer
+  // listen delete button
   let removeBtn = document.querySelectorAll(".deleteItem");
   for (const btn of removeBtn) {
     btn.addEventListener("click", (e) => clickToDelete(e.target.id));
   }
 }
-// modifier la quantité du produit
-let totalSelectedProducts = selectedProducts.length;
 
-// recuperer les Id des produits dans une variable
+// take back the Id of the products in a variable
 const productsId = selectedProducts.map((product) =>
   product.productId.toString()
 );
@@ -92,7 +88,7 @@ function productNewQuantity() {
 }
 
 function changeQuantity(productQuantity, id) {
-  // modifier la quantité
+  // modify quantity
   let localStorageproducts = [...selectedProducts];
   let filterProduct = localStorageproducts.filter(
     (product) => product.id == id
@@ -103,7 +99,7 @@ function changeQuantity(productQuantity, id) {
   updateArticlesCartTotal();
 }
 
-// Supprimer un article
+// delete a product
 function clickToDelete(id) {
   selectedProducts.splice(id, 1);
   localStorage.setItem("product", JSON.stringify(selectedProducts));
@@ -152,8 +148,8 @@ generateEventListener();
 updateCartTotalPrice();
 updateArticlesCartTotal();
 
-// -------------------------------------------------Formulaire------------------------------------------------
-// Récuperation des données
+// -------------------------------------------------Form------------------------------------------------
+// take back of data
 
 const btnOrder = document.querySelector("#order");
 
@@ -166,9 +162,9 @@ btnOrder.addEventListener("click", (e) => {
     city: document.querySelector("#city").value,
     email: document.querySelector("#email").value,
   };
-  // vérifications de données
+  // data verification
 
-  // prénom
+  // first name
   function regExpFirstName() {
     const firstNameForm = contact.firstName;
 
@@ -177,7 +173,7 @@ btnOrder.addEventListener("click", (e) => {
     } else {
     }
   }
-  //Nom
+  //last name
   function regExpLastName() {
     const lastNameForm = contact.lastName;
 
@@ -187,7 +183,7 @@ btnOrder.addEventListener("click", (e) => {
     }
   }
 
-  //ville
+  //city
   function regExpCity() {
     const cityForm = contact.city;
 
@@ -197,7 +193,7 @@ btnOrder.addEventListener("click", (e) => {
     }
   }
 
-  // adresse
+  // e-mail
   function regExpEmail() {
     const emailForm = contact.email;
     if (
@@ -207,7 +203,7 @@ btnOrder.addEventListener("click", (e) => {
     } else {
     }
   }
-  // email
+  // adress
   function regExpAddress() {
     const addressForm = contact.address;
     if (/^[a-zA-Z0-9.,-_ ]{5,100}[ ]{0,2}$/.test(addressForm)) {
@@ -216,7 +212,7 @@ btnOrder.addEventListener("click", (e) => {
     }
   }
 
-  // vérification de données en cas d'erreur
+  // data verification in case of errors
   if (
     regExpFirstName() &
     regExpLastName() &
@@ -224,7 +220,7 @@ btnOrder.addEventListener("click", (e) => {
     regExpEmail() &
     regExpAddress()
   ) {
-    //envoyer les données au localstorage
+    //send data to localstorage
     console.log("formulaire ok");
     localStorage.setItem("contact", JSON.stringify(contact));
     sendToServer();
@@ -232,7 +228,7 @@ btnOrder.addEventListener("click", (e) => {
     alert("Merci de vérifier vos données dans le formulaire");
   }
 
-  //envoyer les données vers un serveur ---------------------------------------------------------------------
+  //send data to a server ---------------------------------------------------------------------
   function sendToServer() {
     //productsIdproducts;
     let orderId = "";
