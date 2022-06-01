@@ -17,6 +17,7 @@ async function start() {
   // display an empty cart
   if (selectedProducts.length == 0 || selectedProducts.length == null) {
     let title = (document.querySelector("h1").textContent = "Panier Vide");
+    console.log(title);
     // display selected products
   } else {
     let title = (document.querySelector("h1").textContent = "Votre panier");
